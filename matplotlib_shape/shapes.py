@@ -1,3 +1,5 @@
+import numpy as np
+
 # Convert between [x], [y] and [(x, y)]
 def points_to_xy(points):
   points = np.array(points)
