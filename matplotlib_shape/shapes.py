@@ -111,6 +111,28 @@ def sine_wave(x0=0.0, x1=1.0, y0=0.0, y1=1.0, amplitude=0.5, nwaves=1, phase_off
 
     return x_final, y_final
 
+def merge_and_fill_shapes(ax, polygons, **fill_kwargs):
+
+  shapes = []
+  for x, y in polygons:
+    xy = xy_to_points(x, y)
+    xy = shapely.geometry.Polygon(xy)
+    shapes.append(xy)
+
+  try:
+    union = shapely.ops.cascaded_union(shapes)
+    x, y = union.exterior.xy
+    x = np.array(x) + 3
+    ax.fill(x, y, **fill_kwargs)
+    print(f'Merge polygons: success.')
+  except:
+    print(f'Merge polygons: failed ({len(polygons)} shapes).')
+    for x, y in polygons:
+      x = np.array(x) + 3
+      ax.fill(x, y, **fill_kwargs)
+    
+  return shapes
+
 def buffer_shape(x, y, buffer_size=0.1):
   xy = xy_to_points(x, y)
   s = shapely.geometry.LineString(xy)
@@ -118,5 +140,5 @@ def buffer_shape(x, y, buffer_size=0.1):
   x1, y1 = xy1.exterior.xy
   return x1, y1
 
-def path_effects(lw=1.5, color='w', **kwargs):
+def path_effects(lw=2.0, color='w', **kwargs):
   return [pe.withStroke(linewidth=lw, foreground=color, **kwargs)]
