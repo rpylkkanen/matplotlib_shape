@@ -112,7 +112,7 @@ def sine_wave(x0=0.0, x1=1.0, y0=0.0, y1=1.0, amplitude=0.5, nwaves=1, phase_off
     return x_final, y_final
 
 def buffer_shape(x, y, buffer_size=0.1):
-  xy = dv.xy_to_points(x, y)
+  xy = xy_to_points(x, y)
   s = shapely.geometry.LineString(xy)
   xy1 = shapely.geometry.Polygon(s.buffer(buffer_size).exterior)
   x1, y1 = xy1.exterior.xy
