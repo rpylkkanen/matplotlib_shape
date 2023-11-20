@@ -1,4 +1,7 @@
 import numpy as np
+import shapely.geometry
+import shapely.ops
+import matplotlib.patheffects as pe
 
 # Convert between [x], [y] and [(x, y)]
 def points_to_xy(points):
@@ -77,3 +80,43 @@ def polygon(x0=0, y0=0, n=4, circumradius=None, inradius=None, side_length=None,
     y += y0 + yoffset
 
     return x, y
+
+def sine_wave(x0=0.0, x1=1.0, y0=0.0, y1=1.0, amplitude=0.5, nwaves=1, phase_offset=0, n=100):
+    phase_offset = np.deg2rad(phase_offset)
+
+    # Calculate the direction of the sine wave
+    dx = x1 - x0
+    dy = y1 - y0
+
+    # Calculate the angle of rotation required
+    angle = np.arctan2(dy, dx)
+
+    # Calculate total distance for wavelength normalization
+    distance = np.sqrt(dx**2 + dy**2)
+
+    # Generate a standard horizontal sine wave in a unit space
+    s = np.linspace(0, 1, n)
+    y = amplitude * np.sin(nwaves * 2 * np.pi * s + phase_offset)
+
+    # Stretch the wave to fit the distance between the start and end points
+    x = s * distance
+
+    # Rotate the points using a rotation matrix
+    x_rot = x * np.cos(angle) - y * np.sin(angle)
+    y_rot = x * np.sin(angle) + y * np.cos(angle)
+
+    # Translate the rotated points to the start position
+    x_final = x_rot + x0
+    y_final = y_rot + y0
+
+    return x_final, y_final
+
+def buffer_shape(x, y, buffer_size=0.1):
+  xy = dv.xy_to_points(x, y)
+  s = shapely.geometry.LineString(xy)
+  xy1 = shapely.geometry.Polygon(s.buffer(buffer_size).exterior)
+  x1, y1 = xy1.exterior.xy
+  return x1, y1
+
+def path_effects(lw=1.5, color='w', **kwargs):
+  return [pe.withStroke(linewidth=lw, foreground=color, **kwargs)]
