@@ -111,7 +111,7 @@ def sine_wave(x0=0.0, x1=1.0, y0=0.0, y1=1.0, amplitude=0.5, nwaves=1, phase_off
 
     return x_final, y_final
 
-def merge_and_fill_shapes(ax, polygons, **fill_kwargs):
+def merge_polygons(polygons):
 
   shapes = []
   for x, y in polygons:
@@ -119,19 +119,19 @@ def merge_and_fill_shapes(ax, polygons, **fill_kwargs):
     xy = shapely.geometry.Polygon(xy)
     shapes.append(xy)
 
+  success = None
+  result = None
+
   try:
     union = shapely.ops.cascaded_union(shapes)
     x, y = union.exterior.xy
-    x = np.array(x) + 3
-    ax.fill(x, y, **fill_kwargs)
-    print(f'Merge polygons: success.')
+    result = [(x, y)]
+    success = True
   except:
-    print(f'Merge polygons: failed ({len(polygons)} shapes).')
-    for x, y in polygons:
-      x = np.array(x) + 3
-      ax.fill(x, y, **fill_kwargs)
-    
-  return shapes
+  	result = polygons
+  	success = False
+
+  return result
 
 def buffer_shape(x, y, buffer_size=0.1):
   xy = xy_to_points(x, y)
